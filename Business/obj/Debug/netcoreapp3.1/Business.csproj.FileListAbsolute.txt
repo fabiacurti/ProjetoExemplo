@@ -1,0 +1,52 @@
+C:\Projeto\metta_parcerias\metta_parcerias\Business\bin\Debug\netcoreapp3.1\Business.deps.json
+C:\Projeto\metta_parcerias\metta_parcerias\Business\bin\Debug\netcoreapp3.1\Business.dll
+C:\Projeto\metta_parcerias\metta_parcerias\Business\bin\Debug\netcoreapp3.1\Business.pdb
+C:\Projeto\metta_parcerias\metta_parcerias\Business\bin\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\metta_parcerias\metta_parcerias\Business\bin\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\metta_parcerias\metta_parcerias\Business\obj\Debug\netcoreapp3.1\Business.csproj.AssemblyReference.cache
+C:\Projeto\metta_parcerias\metta_parcerias\Business\obj\Debug\netcoreapp3.1\Business.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto\metta_parcerias\metta_parcerias\Business\obj\Debug\netcoreapp3.1\Business.AssemblyInfoInputs.cache
+C:\Projeto\metta_parcerias\metta_parcerias\Business\obj\Debug\netcoreapp3.1\Business.AssemblyInfo.cs
+C:\Projeto\metta_parcerias\metta_parcerias\Business\obj\Debug\netcoreapp3.1\Business.csproj.CoreCompileInputs.cache
+C:\Projeto\metta_parcerias\metta_parcerias\Business\obj\Debug\netcoreapp3.1\Business.csproj.CopyComplete
+C:\Projeto\metta_parcerias\metta_parcerias\Business\obj\Debug\netcoreapp3.1\Business.dll
+C:\Projeto\metta_parcerias\metta_parcerias\Business\obj\Debug\netcoreapp3.1\Business.pdb
+C:\Projeto\metta_parcerias\Metta\Business\bin\Debug\netcoreapp3.1\Business.deps.json
+C:\Projeto\metta_parcerias\Metta\Business\bin\Debug\netcoreapp3.1\Business.dll
+C:\Projeto\metta_parcerias\Metta\Business\bin\Debug\netcoreapp3.1\Business.pdb
+C:\Projeto\metta_parcerias\Metta\Business\bin\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\metta_parcerias\Metta\Business\bin\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\metta_parcerias\Metta\Business\obj\Debug\netcoreapp3.1\Business.csproj.AssemblyReference.cache
+C:\Projeto\metta_parcerias\Metta\Business\obj\Debug\netcoreapp3.1\Business.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto\metta_parcerias\Metta\Business\obj\Debug\netcoreapp3.1\Business.AssemblyInfoInputs.cache
+C:\Projeto\metta_parcerias\Metta\Business\obj\Debug\netcoreapp3.1\Business.AssemblyInfo.cs
+C:\Projeto\metta_parcerias\Metta\Business\obj\Debug\netcoreapp3.1\Business.csproj.CoreCompileInputs.cache
+C:\Projeto\metta_parcerias\Metta\Business\obj\Debug\netcoreapp3.1\Business.csproj.CopyComplete
+C:\Projeto\metta_parcerias\Metta\Business\obj\Debug\netcoreapp3.1\Business.dll
+C:\Projeto\metta_parcerias\Metta\Business\obj\Debug\netcoreapp3.1\Business.pdb
+C:\Projeto\Portal de Compras\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Business.deps.json
+C:\Projeto\Portal de Compras\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Business.dll
+C:\Projeto\Portal de Compras\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Business.pdb
+C:\Projeto\Portal de Compras\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\Portal de Compras\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\Portal de Compras\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.csproj.AssemblyReference.cache
+C:\Projeto\Portal de Compras\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto\Portal de Compras\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.AssemblyInfoInputs.cache
+C:\Projeto\Portal de Compras\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.AssemblyInfo.cs
+C:\Projeto\Portal de Compras\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.csproj.CoreCompileInputs.cache
+C:\Projeto\Portal de Compras\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.csproj.CopyComplete
+C:\Projeto\Portal de Compras\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.dll
+C:\Projeto\Portal de Compras\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.pdb
+C:\Projeto\College\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Business.deps.json
+C:\Projeto\College\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Business.dll
+C:\Projeto\College\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Business.pdb
+C:\Projeto\College\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\College\Portal de Compras\Business\bin\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\College\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.csproj.AssemblyReference.cache
+C:\Projeto\College\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto\College\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.AssemblyInfoInputs.cache
+C:\Projeto\College\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.AssemblyInfo.cs
+C:\Projeto\College\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.csproj.CoreCompileInputs.cache
+C:\Projeto\College\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.csproj.CopyComplete
+C:\Projeto\College\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.dll
+C:\Projeto\College\Portal de Compras\Business\obj\Debug\netcoreapp3.1\Business.pdb

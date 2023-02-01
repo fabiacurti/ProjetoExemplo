@@ -1,0 +1,48 @@
+C:\Projeto\metta_parcerias\metta_parcerias\Data\bin\Debug\netcoreapp3.1\Data.deps.json
+C:\Projeto\metta_parcerias\metta_parcerias\Data\bin\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\metta_parcerias\metta_parcerias\Data\bin\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\metta_parcerias\metta_parcerias\Data\obj\Debug\netcoreapp3.1\Data.csproj.AssemblyReference.cache
+C:\Projeto\metta_parcerias\metta_parcerias\Data\obj\Debug\netcoreapp3.1\Data.Constantes.Resources.resources
+C:\Projeto\metta_parcerias\metta_parcerias\Data\obj\Debug\netcoreapp3.1\Data.csproj.GenerateResource.cache
+C:\Projeto\metta_parcerias\metta_parcerias\Data\obj\Debug\netcoreapp3.1\Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto\metta_parcerias\metta_parcerias\Data\obj\Debug\netcoreapp3.1\Data.AssemblyInfoInputs.cache
+C:\Projeto\metta_parcerias\metta_parcerias\Data\obj\Debug\netcoreapp3.1\Data.AssemblyInfo.cs
+C:\Projeto\metta_parcerias\metta_parcerias\Data\obj\Debug\netcoreapp3.1\Data.csproj.CoreCompileInputs.cache
+C:\Projeto\metta_parcerias\metta_parcerias\Data\obj\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\metta_parcerias\metta_parcerias\Data\obj\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\metta_parcerias\Metta\Data\bin\Debug\netcoreapp3.1\Data.deps.json
+C:\Projeto\metta_parcerias\Metta\Data\bin\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\metta_parcerias\Metta\Data\bin\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\metta_parcerias\Metta\Data\obj\Debug\netcoreapp3.1\Data.csproj.AssemblyReference.cache
+C:\Projeto\metta_parcerias\Metta\Data\obj\Debug\netcoreapp3.1\Data.Constantes.Resources.resources
+C:\Projeto\metta_parcerias\Metta\Data\obj\Debug\netcoreapp3.1\Data.csproj.GenerateResource.cache
+C:\Projeto\metta_parcerias\Metta\Data\obj\Debug\netcoreapp3.1\Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto\metta_parcerias\Metta\Data\obj\Debug\netcoreapp3.1\Data.AssemblyInfoInputs.cache
+C:\Projeto\metta_parcerias\Metta\Data\obj\Debug\netcoreapp3.1\Data.AssemblyInfo.cs
+C:\Projeto\metta_parcerias\Metta\Data\obj\Debug\netcoreapp3.1\Data.csproj.CoreCompileInputs.cache
+C:\Projeto\metta_parcerias\Metta\Data\obj\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\metta_parcerias\Metta\Data\obj\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\Portal de Compras\Portal de Compras\Data\bin\Debug\netcoreapp3.1\Data.deps.json
+C:\Projeto\Portal de Compras\Portal de Compras\Data\bin\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\Portal de Compras\Portal de Compras\Data\bin\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\Portal de Compras\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.csproj.AssemblyReference.cache
+C:\Projeto\Portal de Compras\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.Constantes.Resources.resources
+C:\Projeto\Portal de Compras\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.csproj.GenerateResource.cache
+C:\Projeto\Portal de Compras\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto\Portal de Compras\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.AssemblyInfoInputs.cache
+C:\Projeto\Portal de Compras\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.AssemblyInfo.cs
+C:\Projeto\Portal de Compras\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.csproj.CoreCompileInputs.cache
+C:\Projeto\Portal de Compras\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\Portal de Compras\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\College\Portal de Compras\Data\bin\Debug\netcoreapp3.1\Data.deps.json
+C:\Projeto\College\Portal de Compras\Data\bin\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\College\Portal de Compras\Data\bin\Debug\netcoreapp3.1\Data.pdb
+C:\Projeto\College\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.csproj.AssemblyReference.cache
+C:\Projeto\College\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.Constantes.Resources.resources
+C:\Projeto\College\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.csproj.GenerateResource.cache
+C:\Projeto\College\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.GeneratedMSBuildEditorConfig.editorconfig
+C:\Projeto\College\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.AssemblyInfoInputs.cache
+C:\Projeto\College\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.AssemblyInfo.cs
+C:\Projeto\College\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.csproj.CoreCompileInputs.cache
+C:\Projeto\College\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.dll
+C:\Projeto\College\Portal de Compras\Data\obj\Debug\netcoreapp3.1\Data.pdb
