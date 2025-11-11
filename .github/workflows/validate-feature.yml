@@ -14,7 +14,6 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
-  SOLUTION_PATH: './Integration.API.sln'
 
 jobs:
   validate:
@@ -31,6 +30,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: 🔍 Detectar arquivo .sln
+        id: detect-solution
+        run: |
+          SLN_FILE=$(find . -maxdepth 1 -name "*.sln" | head -n 1)
+          
+          if [ -z "$SLN_FILE" ]; then
+            echo "❌ ERRO: Nenhum arquivo .sln encontrado na raiz do projeto"
+            exit 1
+          fi
+          
+          echo "solution_path=$SLN_FILE" >> $GITHUB_OUTPUT
+          echo "✅ Arquivo .sln detectado: $SLN_FILE"
 
       - name: 🔍 Validar nome da branch
         if: github.event_name == 'push'
@@ -52,13 +64,13 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 📦 Restaurar dependências
-        run: dotnet restore ${{ env.SOLUTION_PATH }}
+        run: dotnet restore ${{ steps.detect-solution.outputs.solution_path }}
 
       - name: 🏗️ Build do projeto
-        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+        run: dotnet build ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-restore
 
       - name: 🧪 Executar testes unitários
-        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+        run: dotnet test ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
 
       - name: 📊 Publicar resultados dos testes
         uses: dorny/test-reporter@v1

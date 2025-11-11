@@ -12,7 +12,6 @@ on:
 
 env:
   DOTNET_VERSION: '8.0.x'
-  SOLUTION_PATH: './Integration.API.sln'
 
 jobs:
   # Job de validação (roda em PRs)
@@ -31,6 +30,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: 🔍 Detectar arquivo .sln
+        id: detect-solution
+        run: |
+          SLN_FILE=$(find . -maxdepth 1 -name "*.sln" | head -n 1)
+          
+          if [ -z "$SLN_FILE" ]; then
+            echo "❌ ERRO: Nenhum arquivo .sln encontrado na raiz do projeto"
+            exit 1
+          fi
+          
+          echo "solution_path=$SLN_FILE" >> $GITHUB_OUTPUT
+          echo "✅ Arquivo .sln detectado: $SLN_FILE"
 
       - name: 🔍 Validar branch de origem
         run: |
@@ -51,13 +63,13 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 📦 Restaurar dependências
-        run: dotnet restore ${{ env.SOLUTION_PATH }}
+        run: dotnet restore ${{ steps.detect-solution.outputs.solution_path }}
 
       - name: 🏗️ Build do projeto
-        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+        run: dotnet build ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-restore
 
       - name: 🧪 Executar testes
-        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal
+        run: dotnet test ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-build --verbosity normal
 
       - name: ✅ PR validado
         run: echo "✅ Pull Request validado com sucesso!"
@@ -77,19 +89,32 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: 🔍 Detectar arquivo .sln
+        id: detect-solution
+        run: |
+          SLN_FILE=$(find . -maxdepth 1 -name "*.sln" | head -n 1)
+          
+          if [ -z "$SLN_FILE" ]; then
+            echo "❌ ERRO: Nenhum arquivo .sln encontrado na raiz do projeto"
+            exit 1
+          fi
+          
+          echo "solution_path=$SLN_FILE" >> $GITHUB_OUTPUT
+          echo "✅ Arquivo .sln detectado: $SLN_FILE"
+
       - name: ⚙️ Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 📦 Restaurar dependências
-        run: dotnet restore ${{ env.SOLUTION_PATH }}
+        run: dotnet restore ${{ steps.detect-solution.outputs.solution_path }}
 
       - name: 🏗️ Build de Release
-        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+        run: dotnet build ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-restore
 
       - name: 🧪 Executar testes finais
-        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal
+        run: dotnet test ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-build --verbosity normal
 
       - name: 📅 Gerar versão da release
         id: version

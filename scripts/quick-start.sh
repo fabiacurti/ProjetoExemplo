@@ -21,7 +21,7 @@ NC='\033[0m'
 clear
 
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${CYAN}🚀 Integration.API - Quick Start CI/CD${NC}"
+echo -e "${CYAN}🚀 ProjetoExemplo - Quick Start CI/CD${NC}"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
@@ -31,6 +31,20 @@ if [ ! -d ".git" ]; then
     echo -e "${YELLOW}   Execute este script na raiz do repositório.${NC}"
     exit 1
 fi
+
+# Detectar arquivo .sln
+echo -e "${BLUE}🔍 Detectando projeto...${NC}"
+SLN_FILE=$(find . -maxdepth 1 -name "*.sln" | head -n 1)
+
+if [ -z "$SLN_FILE" ]; then
+    echo -e "${RED}❌ ERRO: Nenhum arquivo .sln encontrado na raiz do projeto${NC}"
+    exit 1
+fi
+
+PROJECT_NAME=$(basename "$SLN_FILE" .sln)
+echo -e "${GREEN}✅ Projeto detectado: ${PROJECT_NAME}${NC}"
+echo -e "${BLUE}   Arquivo: ${SLN_FILE}${NC}"
+echo ""
 
 echo -e "${BLUE}📋 Verificando ambiente...${NC}"
 echo ""
@@ -105,14 +119,14 @@ echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 echo -e "${BLUE}Verificando se projeto compila...${NC}"
-if dotnet build > /dev/null 2>&1; then
+if dotnet build "$SLN_FILE" > /dev/null 2>&1; then
     echo -e "${GREEN}✅ Build bem-sucedido${NC}"
 else
     echo -e "${YELLOW}⚠️  Build falhou - verifique o projeto${NC}"
 fi
 
 echo -e "${BLUE}Verificando testes...${NC}"
-if dotnet test > /dev/null 2>&1; then
+if dotnet test "$SLN_FILE" > /dev/null 2>&1; then
     echo -e "${GREEN}✅ Testes passando${NC}"
 else
     echo -e "${YELLOW}⚠️  Alguns testes falharam${NC}"
