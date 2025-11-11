@@ -20,6 +20,11 @@ jobs:
     name: 🏗️ Build e Testes
     runs-on: ubuntu-latest
     
+    outputs:
+      tests_passed: ${{ steps.test-summary.outputs.passed }}
+      tests_total: ${{ steps.test-summary.outputs.total }}
+      tests_failed: ${{ steps.test-summary.outputs.failed }}
+    
     permissions:
       contents: read
       checks: write
@@ -70,29 +75,60 @@ jobs:
         run: dotnet build ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-restore
 
       - name: 🧪 Executar testes unitários
-        run: dotnet test ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+        id: run-tests
+        continue-on-error: true
+        run: |
+          dotnet test ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" > test-output.txt 2>&1
+          TEST_EXIT_CODE=$?
+          cat test-output.txt
+          echo "exit_code=${TEST_EXIT_CODE}" >> $GITHUB_OUTPUT
+          exit ${TEST_EXIT_CODE}
+
+      - name: 📊 Extrair resultados dos testes
+        id: test-summary
+        if: always()
+        run: |
+          if [ -f "test-output.txt" ]; then
+            # Tentar extrair informações dos testes
+            PASSED=$(grep -oP 'Passed!\s+-\s+Failed:\s+\d+,\s+Passed:\s+\K\d+' test-output.txt || echo "0")
+            FAILED=$(grep -oP 'Passed!\s+-\s+Failed:\s+\K\d+' test-output.txt || echo "0")
+            TOTAL=$((PASSED + FAILED))
+            
+            echo "passed=${PASSED}" >> $GITHUB_OUTPUT
+            echo "failed=${FAILED}" >> $GITHUB_OUTPUT
+            echo "total=${TOTAL}" >> $GITHUB_OUTPUT
+            
+            echo "📊 Testes: ${PASSED}/${TOTAL} passaram"
+          else
+            echo "passed=0" >> $GITHUB_OUTPUT
+            echo "failed=0" >> $GITHUB_OUTPUT
+            echo "total=0" >> $GITHUB_OUTPUT
+          fi
 
       - name: 📊 Publicar resultados dos testes
         uses: dorny/test-reporter@v1
         if: always()
+        continue-on-error: true
         with:
           name: Test Results
           path: '**/test-results.trx'
           reporter: dotnet-trx
-          fail-on-error: true
+          fail-on-error: false
 
       - name: ✅ Validação concluída
-        if: success()
+        if: steps.run-tests.outputs.exit_code == '0'
         run: |
           echo "✅ Build e testes executados com sucesso!"
           echo "Branch: ${GITHUB_REF#refs/heads/}"
           echo "Commit: ${{ github.sha }}"
+          echo "Testes: ${{ steps.test-summary.outputs.passed }}/${{ steps.test-summary.outputs.total }} passaram"
 
       - name: ❌ Validação falhou
-        if: failure()
+        if: steps.run-tests.outputs.exit_code != '0'
         run: |
           echo "❌ Falha na validação!"
           echo "Verifique os logs acima para identificar o problema."
+          echo "Testes falhados: ${{ steps.test-summary.outputs.failed }}"
           exit 1
 
   create-pr:
@@ -157,6 +193,8 @@ jobs:
         run: |
           BRANCH_NAME="${{ steps.check-pr.outputs.branch_name }}"
           BASE_BRANCH="${{ steps.check-pr.outputs.base_branch }}"
+          TEST_PASSED="${{ needs.validate.outputs.tests_passed }}"
+          TEST_TOTAL="${{ needs.validate.outputs.tests_total }}"
           
           # Extrair tipo e descrição da branch
           if [[ "$BRANCH_NAME" =~ ^(feature|hotfix)/(.+)$ ]]; then
@@ -178,6 +216,13 @@ jobs:
           # Criar título do PR
           PR_TITLE="${EMOJI} ${TITLE_PREFIX}: ${DESCRIPTION_FORMATTED}"
           
+          # Texto de testes
+          if [ -n "$TEST_TOTAL" ] && [ "$TEST_TOTAL" != "0" ]; then
+            TEST_INFO="Todos os testes passaram (${TEST_PASSED}/${TEST_TOTAL})"
+          else
+            TEST_INFO="Build executado com sucesso"
+          fi
+          
           # Criar corpo do PR
           PR_BODY=$(cat <<EOF
           ## 🤖 Pull Request Automático
@@ -192,7 +237,7 @@ jobs:
           
           ### ✅ Validações Passaram
           - ✅ Build executado com sucesso
-          - ✅ Todos os testes passaram (15/15)
+          - ✅ ${TEST_INFO}
           - ✅ Nomenclatura da branch validada
           
           ### 📝 Descrição
