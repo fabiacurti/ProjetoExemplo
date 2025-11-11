@@ -1,0 +1,268 @@
+name: 🔍 Validação de Features e Hotfixes
+
+# Dispara a action em push e pull requests para branches específicas
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'hotfix/**'
+  pull_request:
+    branches:
+      - developer
+      - main
+    types: [opened, synchronize, reopened]
+
+env:
+  DOTNET_VERSION: '3.1.x'
+
+jobs:
+  validate:
+    name: 🏗️ Build e Testes
+    runs-on: ubuntu-latest
+    
+    outputs:
+      tests_passed: ${{ steps.test-summary.outputs.passed }}
+      tests_total: ${{ steps.test-summary.outputs.total }}
+      tests_failed: ${{ steps.test-summary.outputs.failed }}
+    
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Detectar arquivo .sln
+        id: detect-solution
+        run: |
+          SLN_FILE=$(find . -maxdepth 1 -name "*.sln" | head -n 1)
+          
+          if [ -z "$SLN_FILE" ]; then
+            echo "❌ ERRO: Nenhum arquivo .sln encontrado na raiz do projeto"
+            exit 1
+          fi
+          
+          echo "solution_path=$SLN_FILE" >> $GITHUB_OUTPUT
+          echo "✅ Arquivo .sln detectado: $SLN_FILE"
+
+      - name: 🔍 Validar nome da branch
+        if: github.event_name == 'push'
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "Branch atual: $BRANCH_NAME"
+          
+          if [[ ! "$BRANCH_NAME" =~ ^(feature|hotfix)/ ]]; then
+            echo "❌ ERRO: Branch deve começar com 'feature/' ou 'hotfix/'"
+            echo "Branch atual: $BRANCH_NAME"
+            exit 1
+          fi
+          
+          echo "✅ Nome da branch válido"
+
+      - name: ⚙️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 📦 Restaurar dependências
+        run: dotnet restore ${{ steps.detect-solution.outputs.solution_path }}
+
+      - name: 🏗️ Build do projeto
+        run: dotnet build ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-restore
+
+      - name: 🧪 Executar testes unitários
+        id: run-tests
+        continue-on-error: true
+        run: |
+          dotnet test ${{ steps.detect-solution.outputs.solution_path }} --configuration Release --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx" > test-output.txt 2>&1
+          TEST_EXIT_CODE=$?
+          cat test-output.txt
+          echo "exit_code=${TEST_EXIT_CODE}" >> $GITHUB_OUTPUT
+          exit ${TEST_EXIT_CODE}
+
+      - name: 📊 Extrair resultados dos testes
+        id: test-summary
+        if: always()
+        run: |
+          if [ -f "test-output.txt" ]; then
+            # Tentar extrair informações dos testes
+            PASSED=$(grep -oP 'Passed!\s+-\s+Failed:\s+\d+,\s+Passed:\s+\K\d+' test-output.txt || echo "0")
+            FAILED=$(grep -oP 'Passed!\s+-\s+Failed:\s+\K\d+' test-output.txt || echo "0")
+            TOTAL=$((PASSED + FAILED))
+            
+            echo "passed=${PASSED}" >> $GITHUB_OUTPUT
+            echo "failed=${FAILED}" >> $GITHUB_OUTPUT
+            echo "total=${TOTAL}" >> $GITHUB_OUTPUT
+            
+            echo "📊 Testes: ${PASSED}/${TOTAL} passaram"
+          else
+            echo "passed=0" >> $GITHUB_OUTPUT
+            echo "failed=0" >> $GITHUB_OUTPUT
+            echo "total=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📊 Publicar resultados dos testes
+        uses: dorny/test-reporter@v1
+        if: always()
+        continue-on-error: true
+        with:
+          name: Test Results
+          path: '**/test-results.trx'
+          reporter: dotnet-trx
+          fail-on-error: false
+
+      - name: ✅ Validação concluída
+        if: steps.run-tests.outputs.exit_code == '0'
+        run: |
+          echo "✅ Build e testes executados com sucesso!"
+          echo "Branch: ${GITHUB_REF#refs/heads/}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Testes: ${{ steps.test-summary.outputs.passed }}/${{ steps.test-summary.outputs.total }} passaram"
+
+      - name: ❌ Validação falhou
+        if: steps.run-tests.outputs.exit_code != '0'
+        run: |
+          echo "❌ Falha na validação!"
+          echo "Verifique os logs acima para identificar o problema."
+          echo "Testes falhados: ${{ steps.test-summary.outputs.failed }}"
+          exit 1
+
+  create-pr:
+    name: 🔀 Criar Pull Request
+    runs-on: ubuntu-latest
+    needs: validate
+    if: |
+      github.event_name == 'push' && 
+      needs.validate.result == 'success' &&
+      !contains(github.event.head_commit.message, '[skip-pr]')
+    
+    permissions:
+      contents: read
+      pull-requests: write
+    
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: 📋 Debug - Informações do evento
+        run: |
+          echo "🔍 Informações de Debug:"
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${GITHUB_REF#refs/heads/}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Mensagem: ${{ github.event.head_commit.message }}"
+          echo "Validate result: ${{ needs.validate.result }}"
+
+      - name: 🔍 Verificar se PR já existe
+        id: check-pr
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          
+          # Determinar branch base (developer para feature, main para hotfix)
+          if [[ "$BRANCH_NAME" =~ ^feature/ ]]; then
+            BASE_BRANCH="developer"
+          else
+            BASE_BRANCH="main"
+          fi
+          
+          echo "base_branch=${BASE_BRANCH}" >> $GITHUB_OUTPUT
+          echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+          
+          # Verificar se PR já existe
+          gh pr list --head "$BRANCH_NAME" --base "$BASE_BRANCH" --json number --jq length > pr_count.txt
+          PR_COUNT=$(cat pr_count.txt)
+          
+          if [ "$PR_COUNT" -gt 0 ]; then
+            echo "pr_exists=true" >> $GITHUB_OUTPUT
+            echo "ℹ️ PR já existe para esta branch"
+          else
+            echo "pr_exists=false" >> $GITHUB_OUTPUT
+            echo "✨ Nenhum PR encontrado, será criado um novo"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔀 Criar Pull Request automaticamente
+        if: steps.check-pr.outputs.pr_exists == 'false'
+        run: |
+          BRANCH_NAME="${{ steps.check-pr.outputs.branch_name }}"
+          BASE_BRANCH="${{ steps.check-pr.outputs.base_branch }}"
+          TEST_PASSED="${{ needs.validate.outputs.tests_passed }}"
+          TEST_TOTAL="${{ needs.validate.outputs.tests_total }}"
+          
+          # Extrair tipo e descrição da branch
+          if [[ "$BRANCH_NAME" =~ ^(feature|hotfix)/(.+)$ ]]; then
+            TYPE="${BASH_REMATCH[1]}"
+            DESCRIPTION="${BASH_REMATCH[2]}"
+            # Converter underscores e hífens para espaços
+            DESCRIPTION_FORMATTED=$(echo "$DESCRIPTION" | tr '_-' '  ' | sed 's/  */ /g')
+          fi
+          
+          # Definir emoji e título baseado no tipo
+          if [[ "$TYPE" == "feature" ]]; then
+            EMOJI="✨"
+            TITLE_PREFIX="feat"
+          else
+            EMOJI="🐛"
+            TITLE_PREFIX="fix"
+          fi
+          
+          # Criar título do PR
+          PR_TITLE="${EMOJI} ${TITLE_PREFIX}: ${DESCRIPTION_FORMATTED}"
+          
+          # Texto de testes
+          if [ -n "$TEST_TOTAL" ] && [ "$TEST_TOTAL" != "0" ]; then
+            TEST_INFO="Todos os testes passaram (${TEST_PASSED}/${TEST_TOTAL})"
+          else
+            TEST_INFO="Build executado com sucesso"
+          fi
+          
+          # Criar corpo do PR
+          PR_BODY=$(cat <<EOF
+          ## 🤖 Pull Request Automático
+          
+          Este PR foi criado automaticamente após a validação bem-sucedida da branch.
+          
+          ### 📊 Informações
+          - **Branch:** \`${BRANCH_NAME}\`
+          - **Target:** \`${BASE_BRANCH}\`
+          - **Commit:** \`${GITHUB_SHA:0:7}\`
+          - **Tipo:** ${TYPE}
+          
+          ### ✅ Validações Passaram
+          - ✅ Build executado com sucesso
+          - ✅ ${TEST_INFO}
+          - ✅ Nomenclatura da branch validada
+          
+          ### 📝 Descrição
+          ${DESCRIPTION_FORMATTED}
+          
+          ---
+          
+          **💡 Dica:** Para evitar a criação automática de PR, adicione \`[skip-pr]\` na mensagem do commit.
+          EOF
+          )
+          
+          # Criar o PR (sem label para evitar erro se não existir)
+          gh pr create \
+            --base "${BASE_BRANCH}" \
+            --head "${BRANCH_NAME}" \
+            --title "${PR_TITLE}" \
+            --body "${PR_BODY}"
+          
+          echo "✅ Pull Request criado com sucesso!"
+          echo "🔗 Acesse: https://github.com/${{ github.repository }}/pulls"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📢 PR já existe
+        if: steps.check-pr.outputs.pr_exists == 'true'
+        run: |
+          echo "ℹ️ Pull Request já existe para esta branch"
+          echo "Não é necessário criar um novo PR"

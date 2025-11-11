@@ -1,0 +1,168 @@
+# ⚠️ Configuração de Proteção de Branches
+# 
+# Este arquivo serve como documentação e referência para as configurações
+# de proteção de branches que devem ser aplicadas no GitHub.
+# 
+# IMPORTANTE: As regras de proteção de branches devem ser configuradas
+# manualmente no GitHub em: Settings > Branches > Branch protection rules
+# ou via API/CLI do GitHub.
+#
+# Documentação: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches
+
+# =============================================================================
+# 🔒 BRANCH: main
+# =============================================================================
+# Regras de proteção para a branch principal de produção
+
+main:
+  # Proteção básica
+  required_pull_request_reviews:
+    required_approving_review_count: 2        # Mínimo 2 aprovações
+    dismiss_stale_reviews: true                # Descartar reviews antigas
+    require_code_owner_reviews: true           # Requer review de CODEOWNERS
+    require_last_push_approval: true           # Aprovação após último push
+
+  # Status checks obrigatórios
+  required_status_checks:
+    strict: true                               # Branch deve estar atualizada
+    contexts:
+      - "🔍 Validar Pull Request"              # Job do create-release.yml
+      - "🏗️ Build e Testes"                    # Job do validate-feature.yml (se aplicável)
+
+  # Restrições
+  restrictions:
+    users: []                                  # Listar usuários específicos se necessário
+    teams: ["tech-leads", "devops"]           # Times com permissão para merge
+    apps: ["github-actions"]                   # Apps autorizados
+
+  # Regras adicionais
+  enforce_admins: true                         # Aplicar regras até para admins
+  required_linear_history: true                # Histórico linear (sem merge commits)
+  allow_force_pushes: false                    # Bloquear force push
+  allow_deletions: false                       # Bloquear exclusão da branch
+  required_conversation_resolution: true       # Resolver todas as conversas
+  lock_branch: false                           # Não bloquear (permitir PRs)
+  allow_fork_syncing: false                    # Desabilitar sync de forks
+
+# =============================================================================
+# 🔒 BRANCH: developer
+# =============================================================================
+# Regras de proteção para a branch de desenvolvimento
+
+developer:
+  # Proteção básica
+  required_pull_request_reviews:
+    required_approving_review_count: 1        # Mínimo 1 aprovação
+    dismiss_stale_reviews: true                # Descartar reviews antigas
+    require_code_owner_reviews: false          # Não requer CODEOWNERS
+    require_last_push_approval: false          # Não requer aprovação após push
+
+  # Status checks obrigatórios
+  required_status_checks:
+    strict: true                               # Branch deve estar atualizada
+    contexts:
+      - "🏗️ Build e Testes"                    # Job do validate-feature.yml
+
+  # Restrições
+  restrictions:
+    users: []                                  # Todos os desenvolvedores
+    teams: ["developers"]                      # Time de desenvolvimento
+    apps: ["github-actions"]                   # Apps autorizados
+
+  # Regras adicionais
+  enforce_admins: false                        # Não aplicar para admins
+  required_linear_history: false               # Permitir merge commits
+  allow_force_pushes: false                    # Bloquear force push
+  allow_deletions: false                       # Bloquear exclusão da branch
+  required_conversation_resolution: true       # Resolver conversas
+  lock_branch: false                           # Não bloquear
+  allow_fork_syncing: false                    # Desabilitar sync de forks
+
+# =============================================================================
+# 🔒 BRANCH PATTERN: release/*
+# =============================================================================
+# Regras de proteção para branches de release
+
+release/*:
+  # Proteção básica
+  required_pull_request_reviews:
+    required_approving_review_count: 1        # Mínimo 1 aprovação
+    dismiss_stale_reviews: true                # Descartar reviews antigas
+    require_code_owner_reviews: true           # Requer CODEOWNERS
+    require_last_push_approval: true           # Aprovação após último push
+
+  # Status checks obrigatórios
+  required_status_checks:
+    strict: true                               # Branch deve estar atualizada
+    contexts:
+      - "🏗️ Build e Testes"                    # Job do validate-feature.yml
+
+  # Restrições
+  restrictions:
+    users: []                                  # Usuários específicos
+    teams: ["tech-leads", "release-managers"]  # Times autorizados
+    apps: ["github-actions"]                   # Apps autorizados
+
+  # Regras adicionais
+  enforce_admins: true                         # Aplicar para admins
+  required_linear_history: true                # Histórico linear
+  allow_force_pushes: false                    # Bloquear force push
+  allow_deletions: false                       # Bloquear exclusão
+  required_conversation_resolution: true       # Resolver conversas
+  lock_branch: false                           # Não bloquear
+  allow_fork_syncing: false                    # Desabilitar sync de forks
+
+# =============================================================================
+# 📋 CONFIGURAÇÃO VIA GITHUB CLI
+# =============================================================================
+# 
+# Para aplicar essas configurações via CLI, use os comandos abaixo:
+# (Requer GitHub CLI instalado: https://cli.github.com/)
+
+# --- Branch main ---
+# gh api repos/{owner}/{repo}/branches/main/protection \
+#   --method PUT \
+#   --field required_pull_request_reviews[required_approving_review_count]=2 \
+#   --field required_pull_request_reviews[dismiss_stale_reviews]=true \
+#   --field required_status_checks[strict]=true \
+#   --field required_status_checks[contexts][]=validate-feature \
+#   --field enforce_admins=true \
+#   --field required_linear_history=true \
+#   --field allow_force_pushes=false \
+#   --field allow_deletions=false
+
+# --- Branch developer ---
+# gh api repos/{owner}/{repo}/branches/developer/protection \
+#   --method PUT \
+#   --field required_pull_request_reviews[required_approving_review_count]=1 \
+#   --field required_status_checks[strict]=true \
+#   --field required_status_checks[contexts][]=validate-feature \
+#   --field allow_force_pushes=false
+
+# =============================================================================
+# 📋 CONFIGURAÇÃO MANUAL NO GITHUB
+# =============================================================================
+#
+# 1. Acesse: https://github.com/{owner}/{repo}/settings/branches
+# 2. Clique em "Add branch protection rule"
+# 3. Configure cada branch seguindo as regras acima
+# 4. Salve as alterações
+#
+# Para cada branch/pattern:
+#   - Branch name pattern: main, developer, release/*
+#   - Marque as opções conforme especificado acima
+#   - Configure os status checks obrigatórios
+#   - Defina as restrições de push/merge
+#
+# =============================================================================
+# 🎯 RESUMO DAS PROTEÇÕES
+# =============================================================================
+#
+# ✅ Commits diretos bloqueados em: main, developer, release/*
+# ✅ PRs obrigatórios com aprovações
+# ✅ Validações CI/CD obrigatórias
+# ✅ Histórico linear na main e release/*
+# ✅ Force push bloqueado em todas
+# ✅ Conversas devem ser resolvidas
+#
+# =============================================================================
