@@ -1,0 +1,171 @@
+name: 🚀 Release Automática
+
+# Dispara quando há merge para main
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  SOLUTION_PATH: './Integration.API.sln'
+
+jobs:
+  # Job de validação (roda em PRs)
+  validate-pr:
+    name: 🔍 Validar Pull Request
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Validar branch de origem
+        run: |
+          SOURCE_BRANCH="${{ github.head_ref }}"
+          echo "Branch de origem: $SOURCE_BRANCH"
+          
+          if [[ ! "$SOURCE_BRANCH" =~ ^(release/|developer$) ]]; then
+            echo "❌ ERRO: Apenas branches 'developer' ou 'release/*' podem fazer PR para main"
+            echo "Branch atual: $SOURCE_BRANCH"
+            exit 1
+          fi
+          
+          echo "✅ Branch de origem válida"
+
+      - name: ⚙️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 📦 Restaurar dependências
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: 🏗️ Build do projeto
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+
+      - name: 🧪 Executar testes
+        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal
+
+      - name: ✅ PR validado
+        run: echo "✅ Pull Request validado com sucesso!"
+
+  # Job de release (roda após merge)
+  create-release:
+    name: 🏷️ Criar Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 📦 Restaurar dependências
+        run: dotnet restore ${{ env.SOLUTION_PATH }}
+
+      - name: 🏗️ Build de Release
+        run: dotnet build ${{ env.SOLUTION_PATH }} --configuration Release --no-restore
+
+      - name: 🧪 Executar testes finais
+        run: dotnet test ${{ env.SOLUTION_PATH }} --configuration Release --no-build --verbosity normal
+
+      - name: 📅 Gerar versão da release
+        id: version
+        run: |
+          # Gera versão baseada na data: YYYY.MM.DD.BUILD
+          DATE_VERSION=$(date +'%Y.%m.%d')
+          BUILD_NUMBER="${{ github.run_number }}"
+          VERSION="${DATE_VERSION}.${BUILD_NUMBER}"
+          
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=v${VERSION}" >> $GITHUB_OUTPUT
+          echo "📦 Versão gerada: v${VERSION}"
+
+      - name: 🏷️ Criar tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a ${{ steps.version.outputs.tag }} -m "Release ${{ steps.version.outputs.tag }}"
+          git push origin ${{ steps.version.outputs.tag }}
+
+      - name: 📝 Gerar changelog
+        id: changelog
+        run: |
+          # Busca commits desde a última tag
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$LAST_TAG" ]; then
+            echo "Primeira release do projeto"
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            echo "Última tag: $LAST_TAG"
+            COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Salva changelog em arquivo
+          echo "## 🚀 Mudanças nesta versão" > changelog.md
+          echo "" >> changelog.md
+          echo "$COMMITS" >> changelog.md
+          
+          cat changelog.md
+
+      - name: 🚀 Criar GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          release_name: Release ${{ steps.version.outputs.tag }}
+          body_path: changelog.md
+          draft: false
+          prerelease: false
+
+      - name: ✅ Release criada
+        run: |
+          echo "✅ Release ${{ steps.version.outputs.tag }} criada com sucesso!"
+          echo "🏷️ Tag: ${{ steps.version.outputs.tag }}"
+          echo "📦 Versão: ${{ steps.version.outputs.version }}"
+          echo "🔗 Acesse: https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.tag }}"
+
+  # Job de notificação
+  notify:
+    name: 📢 Notificar Resultado
+    runs-on: ubuntu-latest
+    needs: [create-release]
+    if: always() && github.event_name == 'push'
+    
+    steps:
+      - name: ✅ Notificação de sucesso
+        if: needs.create-release.result == 'success'
+        run: |
+          echo "✅ Release criada com sucesso!"
+          echo "Todos os testes passaram e a versão foi publicada."
+
+      - name: ❌ Notificação de falha
+        if: needs.create-release.result == 'failure'
+        run: |
+          echo "❌ Falha na criação da release!"
+          echo "Verifique os logs para identificar o problema."
+          exit 1
