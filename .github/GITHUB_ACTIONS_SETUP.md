@@ -1,5 +1,19 @@
 # 🔧 Configuração do GitHub Actions
 
+## ⚠️ IMPORTANTE: Leia Isso Primeiro!
+
+**Status Atual:** A criação automática de Pull Requests está **DESABILITADA** por padrão devido a restrições de permissão do GitHub Actions.
+
+**O que está funcionando:**
+- ✅ Validação automática (build e testes)
+- ✅ Verificação de nomenclatura de branches
+- ✅ Relatórios de testes
+
+**O que NÃO está funcionando:**
+- ❌ Criação automática de Pull Requests
+
+---
+
 ## ⚠️ Problema: "GitHub Actions is not permitted to create or approve pull requests"
 
 Este erro ocorre porque o `GITHUB_TOKEN` padrão tem permissões limitadas. Para que os workflows possam criar Pull Requests automaticamente, você precisa habilitar as permissões corretas.

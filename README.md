@@ -95,13 +95,26 @@ O projeto possui workflows automáticos:
 
 ### ⚠️ Configuração Obrigatória
 
-Para que os workflows funcionem corretamente, **configure as permissões do GitHub Actions**:
+**IMPORTANTE:** A criação automática de PRs está **DESABILITADA** por padrão.
 
-1. Vá em **Settings** → **Actions** → **General**
+Para habilitar, você DEVE configurar as permissões do GitHub Actions:
+
+**Passo 1 - Configurar Permissões:**
+1. Acesse: `https://github.com/fabiacurti/ProjetoExemplo/settings/actions`
 2. Em "Workflow permissions", selecione: **"Read and write permissions"**
 3. ✅ Marque: **"Allow GitHub Actions to create and approve pull requests"**
+4. Clique em **Save**
+
+**Passo 2 - Habilitar no Workflow:**
+1. Edite o arquivo `.github/workflows/validate-feature.yml`
+2. No job `create-pr`, remova a linha `false &&` da condição `if:`
+3. Commit e push as mudanças
 
 📖 [Guia completo de configuração](.github/GITHUB_ACTIONS_SETUP.md)
+
+**Enquanto não configurar:**
+- ✅ Build e testes funcionam normalmente
+- ℹ️ Você precisará criar PRs manualmente ou via `gh pr create`
 
 ## 🎯 Fluxo de Trabalho
 

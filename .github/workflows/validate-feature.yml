@@ -136,9 +136,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: validate
     if: |
+      false &&
       github.event_name == 'push' && 
       needs.validate.result == 'success' &&
       !contains(github.event.head_commit.message, '[skip-pr]')
+    
+    # ⚠️ ATENÇÃO: Este job está DESABILITADO (if: false)
+    # Para habilitar a criação automática de PRs, você DEVE:
+    # 1. Ir em Settings > Actions > General do repositório
+    # 2. Selecionar "Read and write permissions"
+    # 3. Marcar "Allow GitHub Actions to create and approve pull requests"
+    # 4. Remover o "false &&" da condição acima
+    # 
+    # Documentação completa: .github/GITHUB_ACTIONS_SETUP.md
     
     permissions:
       contents: write
@@ -268,3 +278,37 @@ jobs:
         run: |
           echo "ℹ️ Pull Request já existe para esta branch"
           echo "Não é necessário criar um novo PR"
+
+  pr-instructions:
+    name: 📋 Instruções para Criar PR
+    runs-on: ubuntu-latest
+    needs: validate
+    if: |
+      github.event_name == 'push' && 
+      needs.validate.result == 'success' &&
+      !contains(github.event.head_commit.message, '[skip-pr]')
+    
+    steps:
+      - name: 📋 Exibir instruções
+        run: |
+          echo "✅ Build e testes passaram com sucesso!"
+          echo ""
+          echo "🔀 Para criar um Pull Request, você tem 3 opções:"
+          echo ""
+          echo "📍 Opção 1: Criar manualmente via GitHub UI"
+          echo "   https://github.com/${{ github.repository }}/compare/developer...${{ github.ref_name }}"
+          echo ""
+          echo "📍 Opção 2: Usar GitHub CLI localmente"
+          echo "   gh pr create --base developer --head ${{ github.ref_name }}"
+          echo ""
+          echo "📍 Opção 3: Habilitar criação automática (recomendado)"
+          echo "   1. Acesse: https://github.com/${{ github.repository }}/settings/actions"
+          echo "   2. Em 'Workflow permissions', selecione 'Read and write permissions'"
+          echo "   3. Marque '☑ Allow GitHub Actions to create and approve pull requests'"
+          echo "   4. No arquivo validate-feature.yml, remova 'false &&' do job create-pr"
+          echo "   5. Faça commit e push novamente"
+          echo ""
+          echo "📖 Documentação completa em: .github/GITHUB_ACTIONS_SETUP.md"
+          echo ""
+          echo "🎯 Branch validada: ${{ github.ref_name }}"
+          echo "🎯 Target: developer"
