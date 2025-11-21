@@ -13,7 +13,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-  DOTNET_VERSION: '3.1.x'
+  DOTNET_VERSION: '8.0.x'
 
 jobs:
   validate:
@@ -141,14 +141,16 @@ jobs:
       !contains(github.event.head_commit.message, '[skip-pr]')
     
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
+      issues: write
     
     steps:
       - name: 📥 Checkout do código
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ github.token }}
       
       - name: 📋 Debug - Informações do evento
         run: |
@@ -186,7 +188,7 @@ jobs:
             echo "✨ Nenhum PR encontrado, será criado um novo"
           fi
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
 
       - name: 🔀 Criar Pull Request automaticamente
         if: steps.check-pr.outputs.pr_exists == 'false'
@@ -259,7 +261,7 @@ jobs:
           echo "✅ Pull Request criado com sucesso!"
           echo "🔗 Acesse: https://github.com/${{ github.repository }}/pulls"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
 
       - name: 📢 PR já existe
         if: steps.check-pr.outputs.pr_exists == 'true'
