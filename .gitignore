@@ -1,8 +1,8 @@
 ## ==============================================================
-## GITIGNORE OTIMIZADO PARA .NET CORE 3.1 / VISUAL STUDIO 2019+
+## GITIGNORE OTIMIZADO PARA .NET 8 / VISUAL STUDIO 2022+
 ## Baseado no VisualStudio.gitignore oficial + ajustes práticos
 ## ==============================================================
-## Última atualização: 2025-11
+## Última atualização: 2025-11-21 (Migração .NET 8)
 ## ==============================================================
 
 # User-specific files
@@ -48,6 +48,14 @@ artifacts/
 *.nuget.targets
 *.deps.json
 *.runtimeconfig.json
+
+# Arquivos específicos do .NET 8+
+project.nuget.cache
+*.dgspec.json
+project.assets.json
+*.csproj.nuget.dgspec.json
+*.csproj.nuget.g.props
+*.csproj.nuget.g.targets
 
 # Arquivos intermediários e caches do compilador
 *.cache

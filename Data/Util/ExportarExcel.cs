@@ -22,7 +22,12 @@ namespace Data.Util
                 linhaAtual++;
                 for (var i = 0; i < quantidadeColunas; i++)
                 {
-                    worksheet.Cell(linhaAtual, (i + 2)).SetValue(item.GetType().GetProperty(propriedades[i]).GetValue(item));
+                    var value = item.GetType().GetProperty(propriedades[i]).GetValue(item);
+                    var cell = worksheet.Cell(linhaAtual, (i + 2));
+                    if (value != null)
+                    {
+                        cell.Value = XLCellValue.FromObject(value);
+                    }
                 }
             }
 
